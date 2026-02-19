@@ -49,7 +49,7 @@ monitoring we using prometheus + grafana (make it light to be able to run on t3.
 for the cluster on ec2 using kubeadm
 vpc 
 2 public subnets for control plane & workers
-2 private subnets for rds and alb or vpc link(needs research)
+2 private subnets for rds and alb or vpc link(aws requires DB subnet that has 2 subnets in 2 AZs )
 internet Gateway attached to vpc 
 route tables for public subnet 0.0.0.0/0 to Internet Gateway
 no nat gaveway 
@@ -77,7 +77,7 @@ allow all
 
 SG-RDS
 inbound:
-5432(what port is it ?) only from SG-Workers
+5432(PostgreSQL) only from SG-Workers
 
 outbound:
 allow all
@@ -111,7 +111,7 @@ IAM role : allow ssm:GetParameter,ssm:PutParameter for the join cluster command 
 on control plane we need 
 continer runtime (docker)
 kubeadm
-disable swap(?)
+disable swap(usally causes issues with kubeadm . its the standard kubeadm requirment thats what i found)
 
 webapp as a deployment
 we containerize it and store the image in ec3
@@ -132,8 +132,8 @@ this makes it so ALB is not reachable to everyone
 how ? 
 create internal ALB in vpc with private subnets
 create vpc link in API Gateway attached to SG-VPC-Link
-create API Gateway integration(?) pointing to ALB listner (ALB listen waits for output from API itergration)
-routes ANY/{proxy+}(?) to ALB itergration
+create API Gateway integration(?) pointing to ALB listner (ALB listen receives HTTP requests and forwards to the target group)
+routes ANY/{proxy+}(REST API Its the common pattery Method: ANY Resource: /{proxy+} meaing forward every path to backend) to ALB itergration
 
 So only the API Gateway can reach ALB because ALB inbound is only the SG-VPC-Link
 
@@ -208,18 +208,22 @@ and execute it
 
 for scaling master nodes
 we use 
-```kubeadm init phase upload-certs --upload-certs``` to print join command with cert ```kubeadm token create --print-join-command --control-plane --certificate-key <certificate-key>```
+```kubeadm init phase upload-certs --upload-certs``` to print a certificate key
+and we generate join command normally with 
+```kubeadm token create --print-join-command```
+and we add the flags to the join command
+```kubeadm join ... --control-plane --certificate-key <key>```
 
 for saving purposes i think we should keep control plane fixed at 1 node and not scale it 
 
 all the platform finishes(platform features)
 
-RDS
+# RDS
 RDS Postgres in Private subnet
 so its not publicly reachable
-SG allows only SG-Workers on port 5432
+SG allows only SG-Workers on port 5432(PostgreSQL)
 
-CICD
+# CICD
 Jenkinds 
 builds docker image
 push to ecr
@@ -227,12 +231,36 @@ push to ecr
 and we can add argo cd that watches the git repo for manifests 
 and syncs to the cluster automatically 
 
-monitoring and logging
+# monitoring and logging
 Prometheus(with short retention)
 Grafana
 Loki + promtail(agent collects logs and labels them with metadata so we can look through(index& query) them efficiently )
 
-Security 
+# Security 
 Firebase Auth 2FA for the app
 k8s RBAC (so we dont jsut have kubeconfig everywhere)
 and our Properly made Security Groups 
+
+
+# small things that are important 
+
+since we dont have a NAT and workers still need to do pull 
+workers need public up or VPC endpoints/NAT
+so we can just do public ips and block inbound in the SG rules
+
+we also need a way to make worker to worker traffic work
+so we need a CNI (Container Network Interface)
+add in SG-Workers add inbound to all traffic from SG-Workers (self reference)
+only all nodes with in the same SG to talk to each other
+
+
+Prometheus Grafana and loki are kinda heavy on ram so we have a couple options 
+
+1.Keep monitoring minimal at first (metrics-server + Grafana only, or Prometheus with very short retention + low scrape)
+
+2. make worker bigger type t3.small and not t3.micro 
+
+3. run monitoring on a seprate small instance during demo(showcase) X i dont like this 
+
+we need to choose between 1/2
+
