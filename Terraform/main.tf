@@ -5,7 +5,7 @@ module "temp-init-master-node" {
   image_id              = local.image_id
   global_tag            = local.global_tag
   userdata_content      = file(local.userdata_path)
-  instance_profile_name = module.instance_profile.instance_profile_name
+  instance_profile_name = module.instance_profile.control_plane_profile_name
   security_group_id     = module.sg-k8s.security_group_id
 }
 
@@ -24,7 +24,7 @@ module "launch_template_ASG" {
   global_tag = local.global_tag
   vpc_name   = local.vpc_name
 
-  instance_profile_name = module.instance_profile.instance_profile_name
+  instance_profile_name = module.instance_profile.worker_profile_name
   security_group_id     = module.sg-k8s.security_group_id
 
 }
