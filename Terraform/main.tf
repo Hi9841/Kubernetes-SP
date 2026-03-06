@@ -29,6 +29,26 @@ module "launch_template_ASG" {
 
 }
 
+module "nlb" {
+  source             = "./modules/terraform-aws-alb"
+  load_balancer_type = "network"
+  name               = local.nlb_name
+  vpc_id             = local.vpc_id
+  subnets            = data.aws_subnets.all_subnets.ids
+
+  create_security_group = false
+  security_groups       = [module.sg-k8s.security_group_id]
+
+  route53_records = {
+    "master-nlb.nach-hi.click" = {
+      zone_id = data.aws_route53_zone.primary.id
+      type = "A"
+      evaluate_target_health = true
+      allow_overwrite = true
+    }
+  }
+}
+
 module "sg-k8s" {
   source     = "./modules/sg-k8s"
   vpc_name   = local.vpc_name

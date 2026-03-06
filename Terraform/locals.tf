@@ -1,6 +1,11 @@
 locals {
   # Global config
   global_tag = "nach-hi-status-page"
+  vpc_id     = module.sg-k8s.vpc_id
+  zone_name  = "nach-hi.click"
+
+  # NLB Config
+  nlb_name = "nach-hi-master"
 
   # Init ec2 config
   master_init_node = {
@@ -8,7 +13,7 @@ locals {
     instance_type = "t3.small"
     tag           = "tf-nach-master-node"
   }
-  userdata_path = "./scripts/userdata_init.sh"
+  userdata_path = "./scripts/userdata_init.sh.tftpl"
   image_id      = "ami-0970689b372f08997"
   key_pair_name = "nachman-home-nitzanim"
 
