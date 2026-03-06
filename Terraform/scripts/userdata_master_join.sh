@@ -1,27 +1,31 @@
+cat << 'EOF' > /usr/local/bin/update-ssm-join.sh
 #!/bin/bash
 set -euo pipefail
 
 AwsRegion="us-east-1"
 SsmJoinCpParam="/k8s/NachHi/Join/ControlPlane"
-export AWS_REGION="${AwsRegion}"
+SsmJoinWorkerParam="/k8s/NachHi/Join/Worker"
 
+CertKey=$(kubeadm init phase upload-certs --upload-certs | tail -n 1)
+WorkerJoinCommand=$(kubeadm token create --print-join-command)
+ControlPlaneJoinCommand="${WorkerJoinCommand} --control-plane --certificate-key ${CertKey}"
 
-exec > >(tee -a /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+aws ssm put-parameter \
+  --name "${SsmJoinWorkerParam}" \
+  --type "SecureString" \
+  --overwrite \
+  --value "${WorkerJoinCommand}" \
+  --region "${AwsRegion}"
 
-echo "==> Starting join-master user-data script"
-date
+aws ssm put-parameter \
+  --name "${SsmJoinCpParam}" \
+  --type "SecureString" \
+  --overwrite \
+  --value "${ControlPlaneJoinCommand}" \
+  --region "${AwsRegion}"
 
+EOF
 
-echo "==> Fetching Control Plane Join Command from SSM"
-JoinCmd=$(aws ssm get-parameter --name "${SsmJoinCpParam}" --with-decryption --region "${AwsRegion}" --query "Parameter.Value" --output text)
+chmod +x /usr/local/bin/update-ssm-join.sh
 
-echo "==> Executing Join Command"
-eval $JoinCmd
-
-echo "==> Configuring kubectl"
-mkdir -p /root/.kube
-cp -f /etc/kubernetes/admin.conf /root/.kube/config
-chmod 600 /root/.kube/config
-
-echo "==> Master successfully joined"
-date
+echo "*/5 * * * * /usr/local/bin/update-ssm-join.sh" | crontab -
