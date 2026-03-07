@@ -49,3 +49,7 @@ variable "max_amount" {
 variable "vpc_name" {
   type = string
 }
+
+variable "tg_arns" {
+  type = list
+}

@@ -28,6 +28,14 @@ resource "aws_vpc_security_group_ingress_rule" "allow_http" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_kube_api_server" {
+  security_group_id = aws_security_group.allow_http_ssh.id
+  from_port         = 6443
+  to_port           = 6443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_vpc_security_group_ingress_rule" "allow_custom_ports" {
   security_group_id = aws_security_group.allow_http_ssh.id
   from_port         = 30000

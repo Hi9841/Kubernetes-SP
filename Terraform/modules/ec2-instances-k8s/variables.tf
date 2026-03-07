@@ -35,8 +35,6 @@ variable "userdata_content" {
   description = "The path for the user data script"
 }
 
-# variable "region" {
-#     type = string
-#     description = "AWS region"
-#     default = "us-east-1"
-# }
+variable "tg_arn" {
+  type = string
+}

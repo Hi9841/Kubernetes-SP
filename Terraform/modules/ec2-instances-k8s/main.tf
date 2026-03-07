@@ -11,3 +11,8 @@ resource "aws_instance" "k8s-node" {
     env  = var.global_tag
   }
 }
+
+resource "aws_lb_target_group_attachment" "test_attachment" {
+  target_group_arn = var.tg_arn
+  target_id        = aws_instance.k8s-node.id
+}

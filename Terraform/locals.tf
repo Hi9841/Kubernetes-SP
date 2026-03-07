@@ -34,6 +34,7 @@ locals {
       userdata_path = "./scripts/userdata_master_join.sh"
       min_amount    = 3
       max_amount    = 5
+      tg_arns       = [module.nlb.target_groups["api_server_tg_nach_hi"].arn]
     },
     worker_node = {
       instance_type = "t3.small"
@@ -43,6 +44,7 @@ locals {
       userdata_path = "./scripts/userdata_worker_join.sh"
       min_amount    = 2
       max_amount    = 5
+      tg_arns       = []
     }
   }
 }

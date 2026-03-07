@@ -39,6 +39,8 @@ resource "aws_autoscaling_group" "k8s-nodes" {
   name                = "asg-${var.node_tag}"
   vpc_zone_identifier = data.aws_subnets.all_subnets.ids
 
+  target_group_arns = var.tg_arns
+
   # Scaling Boundaries
   min_size         = var.min_amount
   max_size         = var.max_amount
