@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Database: PostgreSQL
+  db:
+    image: postgres:15-alpine
+    container_name: sp-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=statuspage
+      - POSTGRES_USER=statuspage
+      - POSTGRES_PASSWORD=statuspage
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U statuspage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Cache & Task Queue: Redis
+  redis:
+    image: redis:alpine
+    container_name: sp-redis
+
+  # The Application
+  status-page:
+    build: .
+    container_name: sp-app
+    command: python3 statuspage/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DATABASE_NAME=statuspage
+      - DATABASE_USER=statuspage
+      - DATABASE_PASSWORD=statuspage
+      - DATABASE_HOST=db
+      - REDIS_HOST=redis
+      - ALLOWED_HOSTS=*
+      - DEBUG=True
+      - SECRET_KEY=your-long-random-secret-key-here
+
+volumes:
+  postgres_data:

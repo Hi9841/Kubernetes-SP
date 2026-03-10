@@ -14,7 +14,11 @@ VERSION = '2.5.1'
 HOSTNAME = platform.node()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this line
+    # ...
+]
 if sys.version_info < (3, 10):
     raise RuntimeError(
         f"Status-Page requires Python 3.10 or later. (Currently installed: Python {platform.python_version()})"
