@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statuspage-web
+  namespace: statuspage
+  labels:
+    workload: StatusPage-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      workload: StatusPage-ui
+  template:
+    metadata:
+      labels:
+        workload: StatusPage-ui
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for postgres to be ready..."
+              until nc -z postgres.statuspage.svc.cluster.local 5432; do
+                echo "  postgres not ready, retrying in 3s..."
+                sleep 3
+              done
+              echo "postgres is ready!"
+        - name: wait-for-redis
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for redis to be ready..."
+              until nc -z redis.statuspage.svc.cluster.local 6379; do
+                echo "  redis not ready, retrying in 3s..."
+                sleep 3
+              done
+              echo "redis is ready!"
+      containers:
+        - name: statuspage-frontend
+          image: ecr-repo/StatusPage:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: statuspage-config
+            - secretRef:
+                name: statuspage-secrets
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
