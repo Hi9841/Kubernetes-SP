@@ -38,6 +38,9 @@ locals {
       min_amount    = 3
       max_amount    = 5
       tg_arns       = [module.nlb.target_groups["api_server_tg_nach_hi"].arn]
+
+      instance_profile = module.instance_profile.control_plane_profile_name
+
     },
     worker_node = {
       instance_type = "t3.small"
@@ -48,6 +51,8 @@ locals {
       min_amount    = 2
       max_amount    = 5
       tg_arns       = [module.alb.target_groups["nach_hi_worker_nodes"].arn]
+      instance_profile = module.instance_profile.worker_profile_name
+
     }
   }
 }
