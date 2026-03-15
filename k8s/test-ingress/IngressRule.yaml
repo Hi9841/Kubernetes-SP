@@ -3,7 +3,7 @@ kind: Ingress
 metadata: 
   name: ingress-rule-test
    annotations:
-    nginx.ingress.kubernetes.io/rewrite-target:
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: ingress-class
   rules:
