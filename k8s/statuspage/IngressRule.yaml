@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress 
 metadata: 
   name: ingress-rule-test
+  namespace: statuspage
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
@@ -9,10 +10,10 @@ spec:
   rules:
   - http:
       paths:
-      - path: /health
+      - path: /
         pathType: Prefix
         backend:
           service:
-            name: test-svc
+            name: statuspage-svc
             port:
               number: 80
