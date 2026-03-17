@@ -58,7 +58,7 @@ jobs:
   ecr:
     needs: build
     runs-on: ubuntu-latest
-    environment: Configure Access key
+    environment: Access key
     steps:
     - uses: actions/checkout@v4
 
