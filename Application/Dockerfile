@@ -23,7 +23,6 @@ COPY statuspage/statuspage/configuration_example.py /app/statuspage/statuspage/c
 # Build frontend assets
 WORKDIR /app/statuspage/project-static
 RUN yarn install && yarn bundle
-
 # Back to app root
 WORKDIR /app/statuspage
 
