@@ -17,7 +17,7 @@ jobs:
           POSTGRES_USER: statuspage
           POSTGRES_PASSWORD: statuspage
         ports: [5432:5432]
-        options: >- # checks connections check every 10 seconds timeout of 5 seconds retries 5 times
+        options: >- # checks connections check every 10 seconds timeout of 5 seconds retries 5
           --health-cmd "pg_isready -U statuspage"  
           --health-interval 10s
           --health-timeout 5s
@@ -36,7 +36,17 @@ jobs:
     - name: build image
       run: docker build -f ./Application/Dockerfile ./Application --tag statuspage:latest
     - name: run container
-      run: docker run -d --name test-container --network host statuspage:latest
+    - name: run container
+          run: |
+            docker run -d \
+              --name test-container \
+              --network host \
+              -e DB_HOST=localhost \
+              -e DB_PORT=5432 \
+              -e DB_USER=statuspage \
+              -e DB_PASSWORD=statuspage \
+              -e DB_NAME=status-page \
+              statuspage:latest
     - name: Test container
       run: |
         sleep 15
