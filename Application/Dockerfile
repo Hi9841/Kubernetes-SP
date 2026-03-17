@@ -18,8 +18,7 @@ RUN pip install -r requirements.txt && pip install gunicorn
 
 # Copy application code
 COPY . .
-COPY configuration.example.py /app/statuspage/statuspage/configuration.py
-
+COPY statuspage/statuspage/configuration_example.py /app/statuspage/statuspage/configuration.py
 # Build frontend assets
 WORKDIR /app/statuspage/project-static
 RUN yarn install && yarn bundle
