@@ -48,7 +48,7 @@ jobs:
           statuspage:latest
     - name: Test container
       run: |
-        sleep 15
+        sleep 5
         docker ps -a
         docker logs test-container
         curl --fail --retry 5 --retry-delay 3 --retry-connrefused http://localhost:8000 || exit 1
@@ -75,5 +75,5 @@ jobs:
 
     - name: Build and push to ECR
       run: |
-        docker build -f ./Application/Dockerfile ./Application --tag ${{ steps.login-ecr.outputs.registry }}/nach-hi/statuspage:${{ github.sha }}
-        docker push ${{ steps.login-ecr.outputs.registry }}/nach-hi/statuspage:${{ github.sha }}
+        docker build -f ./Application/Dockerfile ./Application --tag ${{ steps.login-ecr.outputs.registry }}/nach-hi/status-page:${{ github.sha }}
+        docker push ${{ steps.login-ecr.outputs.registry }}/nach-hi/status-page:${{ github.sha }}
