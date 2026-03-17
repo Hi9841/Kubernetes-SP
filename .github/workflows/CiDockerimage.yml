@@ -37,16 +37,16 @@ jobs:
       run: docker build -f ./Application/Dockerfile ./Application --tag statuspage:latest
     - name: run container
     - name: run container
-          run: |
-            docker run -d \
-              --name test-container \
-              --network host \
-              -e DB_HOST=localhost \
-              -e DB_PORT=5432 \
-              -e DB_USER=statuspage \
-              -e DB_PASSWORD=statuspage \
-              -e DB_NAME=status-page \
-              statuspage:latest
+      run: |
+        docker run -d \
+          --name test-container \
+          --network host \
+          -e DB_HOST=localhost \
+          -e DB_PORT=5432 \
+          -e DB_USER=statuspage \
+          -e DB_PASSWORD=statuspage \
+          -e DB_NAME=status-page \
+          statuspage:latest
     - name: Test container
       run: |
         sleep 15
