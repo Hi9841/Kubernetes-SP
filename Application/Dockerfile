@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install -r requirements.txt && pip install gunicorn
 
-
 # Copy application codee
 COPY . .
 COPY statuspage/statuspage/configuration_example.py /app/statuspage/statuspage/configuration.py
