@@ -1,6 +1,8 @@
 name: build test and push docker image to ecr
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
