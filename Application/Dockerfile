@@ -24,11 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt && \
-    pip uninstall -y rq_scheduler || true && \
-    pip install --upgrade --force-reinstall "rq-scheduler>=0.14.0"
-
-# Verify rq_scheduler is importable
-RUN python -c "import rq, rq_scheduler; print('rq_scheduler OK')"
+    python -c "import rq, rq_scheduler; print('rq_scheduler OK')"
 
 # Copy application codee
 COPY . .
