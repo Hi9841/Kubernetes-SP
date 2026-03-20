@@ -23,8 +23,16 @@ COPY statuspage/statuspage/configuration_example.py /app/statuspage/statuspage/c
 # Build frontend assets
 WORKDIR /app/statuspage/project-static
 RUN yarn install && yarn bundle
+# Verify frontend build produced output
+RUN test -f dist/statuspage.js && test -f dist/statuspage.css \
+    && echo "Frontend build verified." \
+    || (echo "ERROR: Frontend build failed — dist/ is missing files" && exit 1)
+
 # Back to app root
 WORKDIR /app/statuspage
+
+# Collect static files into the image at build time
+RUN python manage.py collectstatic --no-input
 
 # Copy entrypoint
 COPY docker-entrypoint.sh /docker-entrypoint.sh

@@ -7,8 +7,6 @@ statuspage/project-static/node_modules
 venv
 env
 
-# Build artifacts (we rebuild these in the image)
-statuspage/project-static/dist
 
 # Git and IDE
 .git
