@@ -45,6 +45,7 @@ spec:
           image: 992382545251.dkr.ecr.us-east-1.amazonaws.com/nach-hi/status-page:830c7f6a871695da945a33d482a68f9822da7742
           ports:
             - containerPort: 8000
+              name: metrics
           envFrom:
             - configMapRef:
                 name: statuspage-config

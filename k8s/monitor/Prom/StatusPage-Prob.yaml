@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: statuspage-ui-probe
+  namespace: statuspage
+  labels:
+    release: prom-stack # Strictly required for discovery by your Prometheus instance
+spec:
+  interval: 30s
+  # Instructs the blackbox exporter to expect an HTTP 200-299 response code
+  module: http_2xx
+  prober:
+    # The internal DNS address of the newly installed blackbox exporter service
+    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        # The internal DNS address of your StatusPage web service
+        - http://statuspage-svc.statuspage.svc.cluster.local:8000/

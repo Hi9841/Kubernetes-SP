@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: sp-monitor
+  namespace: statuspage
+  labels:
+    release: prom-stack # Strictly required for discovery by the default configuration
+spec:
+  selector:
+    matchLabels:
+      workload: StatusPage-ui # Matches the label on our target pod
+  podMetricsEndpoints:
+  - port: metrics # Matches the named port on our target pod container
