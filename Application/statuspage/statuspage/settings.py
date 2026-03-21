@@ -204,6 +204,10 @@ INSTALLED_APPS = [
     'django_rq',
     'drf_yasg',
     'queuing',
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'otp_yubikey',
 ]
 
 MIDDLEWARE = [
@@ -250,6 +254,7 @@ AUTHENTICATION_BACKENDS = [
     'statuspage.authentication.ObjectPermissionBackend',
 ]
 
+OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
